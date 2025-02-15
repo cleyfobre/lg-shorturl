@@ -30,4 +30,34 @@ class ShorturlApplicationTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
     }
+
+    @Test
+    public void getShortUrl() {
+
+        String url = "/short-url?oriUrl=https://www.lgtest.com";
+        
+        ResponseEntity<String> response = restTemplate.getForEntity(
+            url,
+            String.class
+        );
+
+        System.out.println(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    public void getOriUrl() {
+
+        String url = "/ori-url?shortUrl=https://www.lgtest.com";
+        
+        ResponseEntity<String> response = restTemplate.getForEntity(
+            url,
+            String.class
+        );
+
+        System.out.println(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
 }
