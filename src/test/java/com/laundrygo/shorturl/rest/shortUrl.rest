@@ -1,0 +1,9 @@
+@baseUrl = http://localhost:8080
+
+### get short url
+GET {{baseUrl}}/short-url?oriUrl=https://hello.com
+Content-Type: application/json
+
+### get original url
+GET {{baseUrl}}/ori-url?shortUrl=sE2gxeRy
+Content-Type: application/json
