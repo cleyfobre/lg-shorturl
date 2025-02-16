@@ -21,7 +21,7 @@ public class ShortUrlController {
     private final Map<String, String> urlMap = new HashMap<>();
     private final Map<String, String> reverseUrlMap = new HashMap<>();
     private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private static final int SHORT_URL_LENGTH = 8;
+    private static final int SHORT_URL_LENGTH = 5;
 
     @GetMapping("/short-url")
     public String getShortUrl(@RequestParam("oriUrl") String oriUrl) {
@@ -53,18 +53,26 @@ public class ShortUrlController {
             // 16 bytes fixed
             MessageDigest md = MessageDigest.getInstance("MD5");
             String input = oriUrl + (salt > 0 ? String.valueOf(salt) : "");
-            byte[] hashBytes = md.digest(input.getBytes());
+            byte[] hashBytes = md.digest(input.getBytes()); // 16 bytes
 
-            // hash to BigInteger
-            BigInteger hashValue = new BigInteger(1, hashBytes);
+            // hash to long
+            long hashValue = 0;
+            for (byte b : hashBytes) {
+                hashValue = (hashValue << 8) | (b & 0xFF);
+            }
+
+            if (hashValue < 0) {
+                hashValue = -hashValue;
+            }
 
             // make shortUrl
             StringBuilder shortUrl = new StringBuilder();
             for (int i = 0; i < SHORT_URL_LENGTH; i++) {
-                BigInteger index = hashValue.mod(BigInteger.valueOf(BASE62.length()));
-                shortUrl.append(BASE62.charAt(index.intValue()));
-                hashValue = hashValue.divide(BigInteger.valueOf(BASE62.length()));
+                long index = hashValue % BASE62.length();
+                shortUrl.append(BASE62.charAt((int) index));
+                hashValue /= BASE62.length();
             }
+            shortUrl.append(".ai");
 
             // check collision
             if (urlMap.containsKey(shortUrl.toString())) {
