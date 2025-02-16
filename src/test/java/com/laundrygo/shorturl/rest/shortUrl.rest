@@ -2,8 +2,8 @@
 
 ### get short url
 GET {{baseUrl}}/short-url?oriUrl=https://dass.com
-Content-Type: application/json
+Content-Type: text/plain
 
 ### get original url
-GET {{baseUrl}}/ori-url?shortUrl=KzKeC.ai
-Content-Type: application/json
+GET {{baseUrl}}/ori-url?shortUrl=YDmVL.ai
+Content-Type: text/plain

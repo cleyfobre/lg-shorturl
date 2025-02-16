@@ -3,6 +3,7 @@ package com.laundrygo.shorturl.controller;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -50,10 +51,10 @@ public class ShortUrlController {
 
     private String generateShortUrl(String oriUrl, int salt) {
         try {
-            // 16 bytes fixed
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            // 32 bytes fixed
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
             String input = oriUrl + (salt > 0 ? String.valueOf(salt) : "");
-            byte[] hashBytes = md.digest(input.getBytes()); // 16 bytes
+            byte[] hashBytes = md.digest(input.getBytes(StandardCharsets.UTF_8)); // 32 bytes
 
             // hash to long
             long hashValue = 0;
@@ -81,7 +82,7 @@ public class ShortUrlController {
 
             return shortUrl.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
+            throw new RuntimeException("SHA-256 algorithm not found", e);
         }
     }
 }
