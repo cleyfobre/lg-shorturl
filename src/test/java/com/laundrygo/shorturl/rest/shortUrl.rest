@@ -1,9 +1,9 @@
 @baseUrl = http://localhost:8080
 
 ### get short url
-GET {{baseUrl}}/short-url?oriUrl=https://dass.com
+GET {{baseUrl}}/short-url?oriUrl=https://land.naver.com
 Content-Type: text/plain
 
 ### get original url
-GET {{baseUrl}}/ori-url?shortUrl=YDmVL.ai
+GET {{baseUrl}}/ori-url?shortUrl=cyqcq.ai
 Content-Type: text/plain

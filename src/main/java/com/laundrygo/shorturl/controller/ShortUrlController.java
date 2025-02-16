@@ -21,7 +21,8 @@ public class ShortUrlController {
 
     private final Map<String, String> urlMap = new HashMap<>();
     private final Map<String, String> reverseUrlMap = new HashMap<>();
-    private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    // private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final String URL_SAFE_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz-";
     private static final int SHORT_URL_LENGTH = 5;
 
     @GetMapping("/short-url")
@@ -58,20 +59,22 @@ public class ShortUrlController {
 
             // hash to long
             long hashValue = 0;
-            for (byte b : hashBytes) {
-                hashValue = (hashValue << 8) | (b & 0xFF);
+            int loopCount = Math.min(hashBytes.length, 8);
+            for (int i = 0; i < loopCount; i++) {
+                hashValue = (hashValue << 8) | (hashBytes[i] & 0xFF);
             }
 
             if (hashValue < 0) {
                 hashValue = -hashValue;
             }
-
+            
             // make shortUrl
             StringBuilder shortUrl = new StringBuilder();
             for (int i = 0; i < SHORT_URL_LENGTH; i++) {
-                long index = hashValue % BASE62.length();
-                shortUrl.append(BASE62.charAt((int) index));
-                hashValue /= BASE62.length();
+                // System.out.println("hashValue" + hashValue);
+                long index = hashValue % URL_SAFE_CHARS.length();
+                shortUrl.append(URL_SAFE_CHARS.charAt((int) index));
+                hashValue /= URL_SAFE_CHARS.length();
             }
             shortUrl.append(".ai");
 
