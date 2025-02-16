@@ -2,52 +2,64 @@ package com.laundrygo.shorturl.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.laundrygo.shorturl.service.UrlService;
+
 @RestController
 @RequiredArgsConstructor
-public class ShortUrlController {
+public class UrlController {
 
-    private final Map<String, String> urlMap = new HashMap<>();
-    private final Map<String, String> reverseUrlMap = new HashMap<>();
+    @Autowired
+    private UrlService urlService;
+
+    // private final Map<String, String> urlMap = new HashMap<>();
+    // private final Map<String, String> reverseUrlMap = new HashMap<>();
     // private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final String URL_SAFE_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz-";
     private static final int SHORT_URL_LENGTH = 5;
 
     @GetMapping("/short-url")
     public String getShortUrl(@RequestParam("oriUrl") String oriUrl) {
-        if (reverseUrlMap.containsKey(oriUrl)) {
-            return reverseUrlMap.get(oriUrl);
+
+        String existingShortUrl = urlService.getShortUrl(oriUrl);
+        if (existingShortUrl != null) {
+            return existingShortUrl;
         }
 
         // 새로운 shortUrl 생성
-        String shortUrl = generateShortUrl(oriUrl, 0); // Initial attempt with salt = 0
-        urlMap.put(shortUrl, oriUrl);
-        reverseUrlMap.put(oriUrl, shortUrl);
+        String shortUrl;
+        int salt = 0;
+        do {
+            shortUrl = generateShortUrl(oriUrl, salt);
+            salt++;
+        } while (urlService.getOriginalUrl(shortUrl) != null); // Collision check with DB
+
+        urlService.save(shortUrl, oriUrl);
 
         return shortUrl;
     }
 
     @GetMapping("ori-url")
-    public String getOriUrl(
-            @RequestParam("shortUrl") String shortUrl) {
+    public String getOriUrl(@RequestParam("shortUrl") String shortUrl) {
 
-        if (urlMap.containsKey(shortUrl)) {
-            return urlMap.get(shortUrl);
+        String originalUrl = urlService.getOriginalUrl(shortUrl);
+
+        if (originalUrl != null) {
+            return originalUrl;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Short URL not found");
         }
+
     }
 
     private String generateShortUrl(String oriUrl, int salt) {
@@ -77,11 +89,6 @@ public class ShortUrlController {
                 hashValue /= URL_SAFE_CHARS.length();
             }
             shortUrl.append(".ai");
-
-            // check collision
-            if (urlMap.containsKey(shortUrl.toString())) {
-                return generateShortUrl(oriUrl, salt + 1);
-            }
 
             return shortUrl.toString();
         } catch (NoSuchAlgorithmException e) {

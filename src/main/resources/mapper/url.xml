@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laundrygo.shorturl.repository.UrlRepository">
+    <select id="findByShortUrl" resultType="com.laundrygo.shorturl.domain.Url">
+        SELECT original_url, short_url
+        FROM url
+        WHERE short_url = #{shortUrl}
+    </select>
+    <select id="findByOriginalUrl" resultType="com.laundrygo.shorturl.domain.Url">
+        SELECT short_url, original_url
+        FROM url
+        WHERE original_url = #{originalUrl}
+    </select>
+    <insert id="save" parameterType="com.laundrygo.shorturl.domain.Url">
+        INSERT INTO url (short_url, original_url)
+        VALUES (#{shortUrl}, #{originalUrl})
+    </insert>
+</mapper>

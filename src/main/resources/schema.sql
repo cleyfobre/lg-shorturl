@@ -6,3 +6,8 @@ create table Member
     name varchar(255) not null,
     primary key (id)
 );
+
+CREATE TABLE url (
+    short_url VARCHAR(255) PRIMARY KEY,
+    original_url TEXT
+);
