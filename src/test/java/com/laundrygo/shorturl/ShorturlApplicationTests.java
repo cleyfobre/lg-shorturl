@@ -42,7 +42,7 @@ class ShorturlApplicationTests {
     @Order(1)
     public void getShortUrl() {
 
-        String url = "/short-url?oriUrl=https://hello.com";
+        String url = "/short-url?oriUrl=https://land.naver.com";
         
         ResponseEntity<String> response = restTemplate.getForEntity(
             url,
@@ -58,7 +58,7 @@ class ShorturlApplicationTests {
     @Order(2)
     public void getOriUrl() {
 
-        String url = "/ori-url?shortUrl=6cyVTGha";
+        String url = "/ori-url?shortUrl=cyqcq.ai";
         
         ResponseEntity<String> response = restTemplate.getForEntity(
             url,
